@@ -7,18 +7,15 @@ import Link from "next/link";
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ callbackUrl?: string }>;
 }) {
   const session = await getServerSession(authOptions);
   const params = await searchParams;
-  const token = params.token;
+  const callbackUrl = params.callbackUrl || "/dashboard";
 
-  // Si l'utilisateur est connecté, rediriger vers le dashboard avec le token si présent
+  // Si l'utilisateur est connecté, rediriger vers le callbackUrl
   if (session) {
-    const redirectUrl = token
-      ? `/dashboard?token=${encodeURIComponent(token)}`
-      : "/dashboard";
-    redirect(redirectUrl);
+    redirect(callbackUrl);
   }
 
   return (
@@ -37,14 +34,22 @@ export default async function HomePage({
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
           <Button asChild size="lg">
             <Link
-              href={token ? `/auth/signup?token=${encodeURIComponent(token)}` : "/auth/signup"}
+              href={
+                callbackUrl
+                  ? `/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  : "/auth/signup"
+              }
             >
               Créer un compte
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
             <Link
-              href={token ? `/auth/signin?token=${encodeURIComponent(token)}` : "/auth/signin"}
+              href={
+                callbackUrl
+                  ? `/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  : "/auth/signin"
+              }
             >
               Se connecter
             </Link>

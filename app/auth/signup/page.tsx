@@ -22,8 +22,8 @@ function SignUpForm() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Récupérer le token depuis l'URL si présent
-  const token = searchParams.get("token");
+  // Récupérer le callbackUrl depuis l'URL (géré par NextAuth)
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +63,7 @@ function SignUpForm() {
         email,
         password,
         redirect: false,
+        callbackUrl,
       });
 
       if (result?.error) {
@@ -73,11 +74,8 @@ function SignUpForm() {
         return;
       }
 
-      // Rediriger vers le dashboard avec le token si présent
-      const redirectUrl = token
-        ? `/dashboard?token=${encodeURIComponent(token)}`
-        : "/dashboard";
-      router.push(redirectUrl);
+      // Rediriger vers le callbackUrl
+      router.push(callbackUrl);
       router.refresh();
     } catch (err) {
       setError("Une erreur est survenue. Veuillez réessayer.");
@@ -93,7 +91,11 @@ function SignUpForm() {
           <p className="text-muted-foreground">
             Déjà un compte ?{" "}
             <Link
-              href={token ? `/auth/signin?token=${encodeURIComponent(token)}` : "/auth/signin"}
+              href={
+                callbackUrl
+                  ? `/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  : "/auth/signin"
+              }
               className="text-primary hover:underline"
             >
               Se connecter
