@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,17 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 
-export default function SignUpPage() {
+function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Récupérer le token depuis l'URL si présent
+  const token = searchParams.get("token");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +73,11 @@ export default function SignUpPage() {
         return;
       }
 
-      router.push("/dashboard");
+      // Rediriger vers le dashboard avec le token si présent
+      const redirectUrl = token
+        ? `/dashboard?token=${encodeURIComponent(token)}`
+        : "/dashboard";
+      router.push(redirectUrl);
       router.refresh();
     } catch (err) {
       setError("Une erreur est survenue. Veuillez réessayer.");
@@ -84,7 +92,10 @@ export default function SignUpPage() {
           <h1 className="text-3xl font-bold">Créer un compte</h1>
           <p className="text-muted-foreground">
             Déjà un compte ?{" "}
-            <Link href="/auth/signin" className="text-primary hover:underline">
+            <Link
+              href={token ? `/auth/signin?token=${encodeURIComponent(token)}` : "/auth/signin"}
+              className="text-primary hover:underline"
+            >
               Se connecter
             </Link>
           </p>
@@ -152,5 +163,13 @@ export default function SignUpPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <SignUpForm />
+    </Suspense>
   );
 }

@@ -4,12 +4,21 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ token?: string }>;
+}) {
   const session = await getServerSession(authOptions);
+  const params = await searchParams;
+  const token = params.token;
 
-  // Si l'utilisateur est connecté, rediriger vers le dashboard
+  // Si l'utilisateur est connecté, rediriger vers le dashboard avec le token si présent
   if (session) {
-    redirect("/dashboard");
+    const redirectUrl = token
+      ? `/dashboard?token=${encodeURIComponent(token)}`
+      : "/dashboard";
+    redirect(redirectUrl);
   }
 
   return (
@@ -27,10 +36,18 @@ export default async function HomePage() {
 
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
           <Button asChild size="lg">
-            <Link href="/auth/signup">Créer un compte</Link>
+            <Link
+              href={token ? `/auth/signup?token=${encodeURIComponent(token)}` : "/auth/signup"}
+            >
+              Créer un compte
+            </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link href="/auth/signin">Se connecter</Link>
+            <Link
+              href={token ? `/auth/signin?token=${encodeURIComponent(token)}` : "/auth/signin"}
+            >
+              Se connecter
+            </Link>
           </Button>
         </div>
 
