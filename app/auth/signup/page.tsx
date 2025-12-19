@@ -93,7 +93,9 @@ function SignUpForm() {
             <Link
               href={
                 callbackUrl
-                  ? `/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  ? `/auth/signin?callbackUrl=${encodeURIComponent(
+                      callbackUrl
+                    )}`
                   : "/auth/signin"
               }
               className="text-primary hover:underline"

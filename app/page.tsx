@@ -36,7 +36,9 @@ export default async function HomePage({
             <Link
               href={
                 callbackUrl
-                  ? `/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  ? `/auth/signup?callbackUrl=${encodeURIComponent(
+                      callbackUrl
+                    )}`
                   : "/auth/signup"
               }
             >
@@ -47,7 +49,9 @@ export default async function HomePage({
             <Link
               href={
                 callbackUrl
-                  ? `/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  ? `/auth/signin?callbackUrl=${encodeURIComponent(
+                      callbackUrl
+                    )}`
                   : "/auth/signin"
               }
             >
