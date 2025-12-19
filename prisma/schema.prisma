@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MealType {
+  breakfast
+  lunch
+  dinner
+}
+
+enum IngredientStatus {
+  pending // Only available to the instance where it was created
+  approved // Available globally (approved by moderator)
+  rejected // Rejected by moderator (not shown in autocomplete)
+}
+
+model User {
+  id                 String       @id @default(uuid())
+  email              String       @unique
+  password           String // Hashed password
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  instances          Instance[]   @relation("UserInstances")
+  slots              Slot[]
+  createdIngredients Ingredient[] // Ingredients created by this user
+}
+
+model Instance {
+  id                 String       @id @default(uuid())
+  name               String
+  users              User[]       @relation("UserInstances")
+  slots              Slot[]
+  meals              Meal[]
+  createdIngredients Ingredient[] // Ingredients created in this instance
+  joinToken          String       @unique
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@index([name])
+}
+
+model Slot {
+  id         String   @id @default(uuid())
+  name       String // Display name for this member (e.g. "Cook 1", "Chef", etc.)
+  instance   Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  instanceId String
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId     String? // Nullable - member can be free/unassigned
+  meals      Meal[]   @relation("MealSlots")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([instanceId, userId]) // Ensures a user can only be associated with one member per instance (when assigned)
+  @@index([instanceId])
+  @@index([userId])
+}
+
+model Meal {
+  id              String           @id @default(uuid())
+  name            String
+  type            MealType
+  date            DateTime?
+  instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  instanceId      String
+  slots           Slot[]           @relation("MealSlots")
+  mealIngredients MealIngredient[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([instanceId])
+  @@index([date])
+}
+
+// Ingredient - tracks origin instance and moderation status
+model Ingredient {
+  id              String           @id @default(uuid())
+  name            String // Normalized name (e.g. "tomato")
+  category        String? // Category of the ingredient (e.g. "fruit et légumes", "épice")
+  instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  instanceId      String // Instance where ingredient was created
+  status          IngredientStatus @default(pending) // Controls global availability
+  createdBy       User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById     String?
+  mealIngredients MealIngredient[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([name, instanceId]) // Unique name per instance
+  @@index([name])
+  @@index([instanceId])
+  @@index([status])
+  @@index([category])
+}
+
+// Join table: links meals to ingredients with quantity/unit
+model MealIngredient {
+  id           String     @id @default(uuid())
+  meal         Meal       @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  mealId       String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  ingredientId String
+  quantity     Float
+  unit         String // e.g. "g", "kg", "ml", "cups", "pieces"
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([mealId])
+  @@index([ingredientId])
+}
