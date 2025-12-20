@@ -15,6 +15,7 @@ import { AddMealOwnerDialog } from "@/components/add-meal-owner-dialog";
 import { JoinMealButton } from "@/components/join-meal-button";
 import { RemoveMealOwnerButton } from "@/components/remove-meal-owner-button";
 import { DeleteIngredientButton } from "@/components/delete-ingredient-button";
+import { SlotUserDisplay } from "@/components/slot-user-display";
 import { Users, Utensils, Calendar, Clock } from "lucide-react";
 import Link from "next/link";
 
@@ -193,18 +194,12 @@ export default async function MealPage({
                 {meal.slots.map((slot) => (
                   <div
                     key={slot.id}
-                    className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                    className="flex items-center p-2 rounded-lg bg-muted/50"
                   >
-                    <span className="font-medium">{slot.name}</span>
-                    {slot.user ? (
-                      <span className="text-muted-foreground text-sm">
-                        {slot.user.email}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground text-sm italic">
-                        Non assigné
-                      </span>
-                    )}
+                    <SlotUserDisplay
+                      slotName={slot.name}
+                      userEmail={slot.user?.email}
+                    />
                   </div>
                 ))}
               </div>

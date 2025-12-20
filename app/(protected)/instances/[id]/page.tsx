@@ -15,6 +15,7 @@ import { ExportShoppingListButton } from "@/components/export-shopping-list-butt
 import { ShareInstanceToken } from "@/components/share-instance-token";
 import { Users, Calendar, Clock, Utensils } from "lucide-react";
 import Link from "next/link";
+import { SlotUserDisplay } from "@/components/slot-user-display";
 
 export default async function InstancePage({
   params,
@@ -133,18 +134,12 @@ export default async function InstancePage({
                 {instance.slots.map((slot) => (
                   <div
                     key={slot.id}
-                    className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                    className="flex items-center p-2 rounded-lg bg-muted/50"
                   >
-                    <span className="font-medium">{slot.name}</span>
-                    {slot.user ? (
-                      <span className="text-muted-foreground text-sm">
-                        {slot.user.email}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground text-sm italic">
-                        Non assigné
-                      </span>
-                    )}
+                    <SlotUserDisplay
+                      slotName={slot.name}
+                      userEmail={slot.user?.email}
+                    />
                   </div>
                 ))}
               </div>
@@ -260,10 +255,13 @@ export default async function InstancePage({
                           {meal.slots.map((slot) => (
                             <span
                               key={slot.id}
-                              className="text-xs px-2 py-1 rounded-full bg-muted"
+                              className="text-xs px-2 py-1 rounded-full bg-muted inline-block"
                             >
-                              {slot.name}
-                              {slot.user && ` (${slot.user.email})`}
+                              <SlotUserDisplay
+                                slotName={slot.name}
+                                userEmail={slot.user?.email}
+                                className="text-xs"
+                              />
                             </span>
                           ))}
                         </div>
