@@ -1,17 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,12 +26,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { INGREDIENT_UNITS } from "@/lib/constants";
-import { Plus } from "lucide-react";
+import { useIngredients } from "@/lib/ingredients-context";
+import { Plus, Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Ingredient = {
   id: string;
   name: string;
+  category?: string | null;
+  defaultUnit?: string | null;
 };
 
 export function AddIngredientDialog({
@@ -45,15 +61,42 @@ export function AddIngredientDialog({
   availableIngredients: Ingredient[];
 }) {
   const router = useRouter();
+  const { ingredients: globalIngredients } = useIngredients();
   const [open, setOpen] = useState(false);
+  const [ingredientOpen, setIngredientOpen] = useState(false);
   const [ingredientId, setIngredientId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Combiner les ingrédients globaux avec les ingrédients de l'instance
+  const allIngredients = [
+    ...globalIngredients,
+    ...availableIngredients.map((ing) => ({
+      id: ing.id,
+      name: ing.name,
+      category: null,
+      defaultUnit: null,
+    })),
+  ].filter(
+    (ing, index, self) => index === self.findIndex((i) => i.id === ing.id)
+  );
+
+  const selectedIngredient = allIngredients.find(
+    (ing) => ing.id === ingredientId
+  );
+
+  // Définir l'unité par défaut quand un ingrédient est sélectionné
+  useEffect(() => {
+    if (selectedIngredient?.defaultUnit && !unit) {
+      setUnit(selectedIngredient.defaultUnit);
+    }
+  }, [selectedIngredient, unit]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("handleSubmit");
     setError("");
 
     if (!ingredientId) {
@@ -101,6 +144,7 @@ export function AddIngredientDialog({
       setIngredientId("");
       setQuantity("");
       setUnit("");
+      setIngredientOpen(false);
       router.refresh();
     } catch (err) {
       setError("Une erreur est survenue. Veuillez réessayer.");
@@ -109,95 +153,135 @@ export function AddIngredientDialog({
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <Button size="sm">
           <Plus className="mr-2 h-4 w-4" />
           Ajouter un ingrédient
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent size="default" className="max-w-md">
-        <form onSubmit={handleSubmit}>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Ajouter un ingrédient</AlertDialogTitle>
-            <AlertDialogDescription>
-              Ajoutez un ingrédient requis pour ce repas.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Ajouter un ingrédient</DialogTitle>
+          <DialogDescription>
+            Ajoutez un ingrédient requis pour ce repas.
+          </DialogDescription>
+        </DialogHeader>
 
-          <div className="mt-4 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Field>
+            <FieldLabel>Ingrédient</FieldLabel>
+            <FieldContent>
+              <Popover open={ingredientOpen} onOpenChange={setIngredientOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={ingredientOpen}
+                    className="w-full justify-between"
+                    disabled={isLoading}
+                    type="button"
+                  >
+                    {selectedIngredient
+                      ? selectedIngredient.name
+                      : "Sélectionner un ingrédient..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-0"
+                  align="start"
+                  style={{ width: "var(--radix-popover-trigger-width)" }}
+                >
+                  <Command>
+                    <CommandInput placeholder="Rechercher un ingrédient..." />
+                    <CommandList>
+                      <CommandEmpty>Aucun ingrédient trouvé.</CommandEmpty>
+                      <CommandGroup>
+                        {allIngredients.map((ingredient) => (
+                          <CommandItem
+                            key={ingredient.id}
+                            value={ingredient.name}
+                            onSelect={() => {
+                              setIngredientId(ingredient.id);
+                              setIngredientOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                ingredientId === ingredient.id
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {ingredient.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </FieldContent>
+          </Field>
+
+          <div className="grid grid-cols-2 gap-4">
             <Field>
-              <FieldLabel>Ingrédient</FieldLabel>
+              <FieldLabel>Quantité</FieldLabel>
+              <FieldContent>
+                <Input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  placeholder="Ex: 200"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  disabled={isLoading}
+                />
+              </FieldContent>
+            </Field>
+
+            <Field>
+              <FieldLabel>Unité</FieldLabel>
               <FieldContent>
                 <Select
-                  value={ingredientId}
-                  onValueChange={setIngredientId}
+                  value={unit}
+                  onValueChange={setUnit}
                   disabled={isLoading}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un ingrédient" />
+                    <SelectValue placeholder="Unité" />
                   </SelectTrigger>
                   <SelectContent>
-                    {availableIngredients.map((ingredient) => (
-                      <SelectItem key={ingredient.id} value={ingredient.id}>
-                        {ingredient.name}
+                    {INGREDIENT_UNITS.map((u) => (
+                      <SelectItem key={u} value={u}>
+                        {u}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FieldContent>
             </Field>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel>Quantité</FieldLabel>
-                <FieldContent>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    placeholder="Ex: 200"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel>Unité</FieldLabel>
-                <FieldContent>
-                  <Select
-                    value={unit}
-                    onValueChange={setUnit}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Unité" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {INGREDIENT_UNITS.map((u) => (
-                        <SelectItem key={u} value={u}>
-                          {u}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldContent>
-              </Field>
-            </div>
-
-            {error && <FieldError>{error}</FieldError>}
           </div>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>Annuler</AlertDialogCancel>
+          {error && <FieldError>{error}</FieldError>}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isLoading}
+            >
+              Annuler
+            </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "Ajout..." : "Ajouter"}
             </Button>
-          </AlertDialogFooter>
+          </DialogFooter>
         </form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }

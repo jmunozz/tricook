@@ -60,6 +60,65 @@ const ingredients = [
   "Chocolat",
 ];
 
+// Fonction pour assigner une unité par défaut à un ingrédient
+function getDefaultUnit(ingredientName: string): string | null {
+  const name = ingredientName.toLowerCase().trim();
+
+  // Unités par défaut selon le type d'ingrédient
+  const weightIngredients = [
+    "poulet",
+    "bœuf",
+    "porc",
+    "saumon",
+    "thon",
+    "crevette",
+    "fromage",
+    "beurre",
+  ];
+  const volumeIngredients = [
+    "huile d'olive",
+    "lait",
+    "crème fraîche",
+    "vinaigre",
+  ];
+  const pieceIngredients = [
+    "œuf",
+    "citron",
+    "pomme",
+    "banane",
+    "fraise",
+    "chocolat",
+  ];
+  const gramIngredients = [
+    "tomate",
+    "oignon",
+    "carotte",
+    "pomme de terre",
+    "courgette",
+    "aubergine",
+    "poivron",
+    "champignon",
+    "épinard",
+    "salade",
+    "concombre",
+    "brocoli",
+    "chou-fleur",
+    "céleri",
+    "poireau",
+    "riz",
+    "pâtes",
+    "farine",
+    "sucre",
+  ];
+
+  if (weightIngredients.includes(name)) return "g";
+  if (volumeIngredients.includes(name)) return "ml";
+  if (pieceIngredients.includes(name)) return "pièce";
+  if (gramIngredients.includes(name)) return "g";
+
+  return null;
+}
+
 // Fonction pour assigner une catégorie à un ingrédient
 function getIngredientCategory(ingredientName: string): string {
   const name = ingredientName.toLowerCase().trim();
@@ -181,6 +240,7 @@ async function main() {
   for (const ingredientName of ingredients) {
     const normalizedName = ingredientName.toLowerCase().trim();
     const category = getIngredientCategory(ingredientName);
+    const defaultUnit = getDefaultUnit(ingredientName);
 
     await prisma.ingredient.upsert({
       where: {
@@ -192,10 +252,12 @@ async function main() {
       update: {
         status: "approved",
         category: category,
+        defaultUnit: defaultUnit,
       },
       create: {
         name: normalizedName,
         category: category,
+        defaultUnit: defaultUnit,
         instanceId: globalInstance.id,
         status: "approved",
         createdById: globalInstance.users?.[0]?.id || null,

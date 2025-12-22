@@ -87,6 +87,7 @@ model Ingredient {
   id              String           @id @default(uuid())
   name            String // Normalized name (e.g. "tomato")
   category        String? // Category of the ingredient (e.g. "fruit et légumes", "épice")
+  defaultUnit     String? // Default unit for this ingredient (e.g. "g", "ml", "pièce")
   instance        Instance         @relation(fields: [instanceId], references: [id], onDelete: Cascade)
   instanceId      String // Instance where ingredient was created
   status          IngredientStatus @default(pending) // Controls global availability

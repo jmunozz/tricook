@@ -3,15 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,7 +20,6 @@ import {
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
-import { Plus } from "lucide-react";
 
 export function CreateInstanceDialog() {
   const router = useRouter();
@@ -68,30 +67,31 @@ export function CreateInstanceDialog() {
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Créer une instance
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="lg" className="hover:cursor-pointer font-bold">
+          Nouveau séjour
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent size="default" className="max-w-md">
-        <form onSubmit={handleSubmit}>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Créer une nouvelle instance</AlertDialogTitle>
-            <AlertDialogDescription>
-              Une instance vous permet d'organiser vos repas avec d'autres
-              utilisateurs.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+      </DialogTrigger>
+      <form onSubmit={handleSubmit}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">
+              Nouveau séjour
+            </DialogTitle>
+            <DialogDescription>
+              Un séjour vous permet d'organiser vos repas avec d'autres
+              personnes.
+            </DialogDescription>
+          </DialogHeader>
 
           <div className="mt-4 space-y-4">
             <Field>
-              <FieldLabel>Nom de l'instance</FieldLabel>
+              <FieldLabel>Nom du séjour</FieldLabel>
               <FieldContent>
                 <Input
                   type="text"
-                  placeholder="Ex: Maison, Appartement, Colocation..."
+                  placeholder="Ex: Noël, Cévènnes 2024..."
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   disabled={isLoading}
@@ -102,14 +102,18 @@ export function CreateInstanceDialog() {
             </Field>
           </div>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>Annuler</AlertDialogCancel>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="ghost" disabled={isLoading}>
+                Annuler
+              </Button>
+            </DialogClose>
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "Création..." : "Créer"}
             </Button>
-          </AlertDialogFooter>
-        </form>
-      </AlertDialogContent>
-    </AlertDialog>
+          </DialogFooter>
+        </DialogContent>
+      </form>
+    </Dialog>
   );
 }

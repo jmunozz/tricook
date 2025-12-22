@@ -2,21 +2,14 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/db";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddIngredientDialog } from "@/components/add-ingredient-dialog";
 import { AddMealOwnerDialog } from "@/components/add-meal-owner-dialog";
 import { JoinMealButton } from "@/components/join-meal-button";
 import { RemoveMealOwnerButton } from "@/components/remove-meal-owner-button";
-import { DeleteIngredientButton } from "@/components/delete-ingredient-button";
-import { SlotUserDisplay } from "@/components/slot-user-display";
-import { Users, Utensils, Calendar, Clock } from "lucide-react";
+import { UserHoverCard } from "@/components/user-hover-card";
+import { IngredientCard } from "@/components/ingredient-card";
+import { Users, Utensils, Clock } from "lucide-react";
 import Link from "next/link";
 
 export default async function MealPage({
@@ -181,7 +174,7 @@ export default async function MealPage({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Propriétaires ({meal.slots.length})
+              Cuistots ({meal.slots.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -192,15 +185,14 @@ export default async function MealPage({
             ) : (
               <div className="space-y-2">
                 {meal.slots.map((slot) => (
-                  <div
-                    key={slot.id}
-                    className="flex items-center p-2 rounded-lg bg-muted/50"
-                  >
-                    <SlotUserDisplay
-                      slotName={slot.name}
-                      userEmail={slot.user?.email}
-                    />
-                  </div>
+                  <UserHoverCard user={slot.user}>
+                    <div
+                      key={slot.id}
+                      className="flex items-center p-2 rounded-lg bg-muted/50"
+                    >
+                      {slot.name}
+                    </div>
+                  </UserHoverCard>
                 ))}
               </div>
             )}
@@ -284,25 +276,13 @@ export default async function MealPage({
               )}
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {meal.mealIngredients.map((mi) => (
-                <div
+                <IngredientCard
                   key={mi.id}
-                  className="flex items-center justify-between p-3 rounded-lg border"
-                >
-                  <div>
-                    <span className="font-medium">{mi.ingredient.name}</span>
-                    <span className="text-muted-foreground text-sm ml-2">
-                      {mi.quantity} {mi.unit}
-                    </span>
-                  </div>
-                  {isMealOwner && (
-                    <DeleteIngredientButton
-                      ingredientId={mi.id}
-                      ingredientName={mi.ingredient.name}
-                    />
-                  )}
-                </div>
+                  mealIngredient={mi}
+                  isMealOwner={isMealOwner}
+                />
               ))}
             </div>
           )}

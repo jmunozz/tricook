@@ -10,9 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CreateInstanceDialog } from "@/components/create-instance-dialog";
-import { JoinInstanceDialogWrapper } from "@/components/join-instance-dialog-wrapper";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Calendar, Users } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -45,15 +43,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Tableau de bord</h1>
-          <p className="text-muted-foreground mt-2">
-            Bienvenue, {session.user.email} !
-          </p>
+          <h1>Séjours</h1>
         </div>
-        <div className="flex gap-2">
-          <JoinInstanceDialogWrapper />
+        <div className="flex gap-2 itemps-center">
           <CreateInstanceDialog />
         </div>
       </div>
@@ -62,41 +56,45 @@ export default async function DashboardPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-muted-foreground text-center mb-4">
-              Vous n'avez pas encore d'instance.
+              Vous n'avez pas encore de séjours.
             </p>
             <CreateInstanceDialog />
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {instances.map((instance) => (
-            <Card key={instance.id} className="hover:ring-2 transition-all">
-              <CardHeader>
-                <CardTitle>{instance.name}</CardTitle>
-                <CardDescription>
-                  Créée le{" "}
-                  {new Date(instance.createdAt).toLocaleDateString("fr-FR")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span>
-                      {instance._count.users} membre
-                      {instance._count.users > 1 ? "s" : ""}
-                    </span>
+            <Link href={`/instances/${instance.id}`}>
+              <Card
+                key={instance.id}
+                className="hover:ring-primary transition-all"
+              >
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold">
+                    {instance.name}
+                  </CardTitle>
+                  <CardDescription className="text-xs text-muted-foreground">
+                    Créé le{" "}
+                    {new Date(instance.createdAt).toLocaleDateString("fr-FR")}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Users className="h-4 w-4" />
+                      <span>
+                        {instance._count.users} membre
+                        {instance._count.users > 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>{instance._count.meals} repas</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{instance._count.meals} repas</span>
-                  </div>
-                </div>
-                <Button asChild variant="outline" className="w-full">
-                  <Link href={`/instances/${instance.id}`}>Ouvrir</Link>
-                </Button>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

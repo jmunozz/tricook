@@ -9,13 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { CreateMealDialog } from "@/components/create-meal-dialog";
 import { ExportShoppingListButton } from "@/components/export-shopping-list-button";
 import { ShareInstanceToken } from "@/components/share-instance-token";
-import { Users, Calendar, Clock, Utensils } from "lucide-react";
+import { ManageSlotsDialog } from "@/components/manage-slots-dialog";
+import { Calendar, Clock, Utensils } from "lucide-react";
 import Link from "next/link";
-import { SlotUserDisplay } from "@/components/slot-user-display";
+import { UserHoverCard } from "@/components/user-hover-card";
+import { Item } from "@/components/ui/item";
 
 export default async function InstancePage({
   params,
@@ -121,26 +122,25 @@ export default async function InstancePage({
         {/* Slots */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Membres ({instance.slots.length})
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                👨‍🍳 Cuistots ({instance.slots.length})
+              </CardTitle>
+              <ManageSlotsDialog
+                instanceId={instance.id}
+                slots={instance.slots}
+              />
+            </div>
           </CardHeader>
           <CardContent>
             {instance.slots.length === 0 ? (
               <p className="text-muted-foreground text-sm">Aucun membre</p>
             ) : (
-              <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
                 {instance.slots.map((slot) => (
-                  <div
-                    key={slot.id}
-                    className="flex items-center p-2 rounded-lg bg-muted/50"
-                  >
-                    <SlotUserDisplay
-                      slotName={slot.name}
-                      userEmail={slot.user?.email}
-                    />
-                  </div>
+                  <UserHoverCard key={slot.id} user={slot.user}>
+                    <Item className="border border-green-400">{slot.name}</Item>
+                  </UserHoverCard>
                 ))}
               </div>
             )}
@@ -253,16 +253,14 @@ export default async function InstancePage({
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {meal.slots.map((slot) => (
-                            <span
-                              key={slot.id}
-                              className="text-xs px-2 py-1 rounded-full bg-muted inline-block"
-                            >
-                              <SlotUserDisplay
-                                slotName={slot.name}
-                                userEmail={slot.user?.email}
-                                className="text-xs"
-                              />
-                            </span>
+                            <UserHoverCard key={slot.id} user={slot.user}>
+                              <span
+                                key={slot.id}
+                                className="text-xs px-2 py-1 rounded-full bg-muted inline-block"
+                              >
+                                {slot.name}
+                              </span>
+                            </UserHoverCard>
                           ))}
                         </div>
                       </div>
