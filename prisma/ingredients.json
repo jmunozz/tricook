@@ -1,0 +1,258 @@
+[
+  {
+    "name": "tomate",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "oignon",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "ail",
+    "category": "Épicerie salée",
+    "defaultUnit": "gousse"
+  },
+  {
+    "name": "carotte",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "pomme de terre",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "courgette",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "aubergine",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "poivron",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "champignon",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "épinard",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "salade",
+    "category": "Fruits et légumes",
+    "defaultUnit": "tête"
+  },
+  {
+    "name": "concombre",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "brocoli",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "chou-fleur",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "céleri",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "poireau",
+    "category": "Fruits et légumes",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "basilic",
+    "category": "Épicerie salée",
+    "defaultUnit": "brin"
+  },
+  {
+    "name": "persil",
+    "category": "Épicerie salée",
+    "defaultUnit": "brin"
+  },
+  {
+    "name": "coriandre",
+    "category": "Épicerie salée",
+    "defaultUnit": "brin"
+  },
+  {
+    "name": "thym",
+    "category": "Épicerie salée",
+    "defaultUnit": "brin"
+  },
+  {
+    "name": "romarin",
+    "category": "Épicerie salée",
+    "defaultUnit": "brin"
+  },
+  {
+    "name": "laurier",
+    "category": "Épicerie salée",
+    "defaultUnit": "feuille"
+  },
+  {
+    "name": "huile d'olive",
+    "category": "Autre",
+    "defaultUnit": "ml"
+  },
+  {
+    "name": "beurre",
+    "category": "Crèmerie et produits laitiers",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "crème fraîche",
+    "category": "Crèmerie et produits laitiers",
+    "defaultUnit": "ml"
+  },
+  {
+    "name": "lait",
+    "category": "Crèmerie et produits laitiers",
+    "defaultUnit": "ml"
+  },
+  {
+    "name": "fromage",
+    "category": "Crèmerie et produits laitiers",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "œuf",
+    "category": "Crèmerie et produits laitiers",
+    "defaultUnit": "pièce"
+  },
+  {
+    "name": "poulet",
+    "category": "Viandes et poissons",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "bœuf",
+    "category": "Viandes et poissons",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "porc",
+    "category": "Viandes et poissons",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "saumon",
+    "category": "Viandes et poissons",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "thon",
+    "category": "Viandes et poissons",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "crevette",
+    "category": "Viandes et poissons",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "riz",
+    "category": "Épicerie salée",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "pâtes",
+    "category": "Épicerie salée",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "pain",
+    "category": "Pains et pâtisseries",
+    "defaultUnit": "tranche"
+  },
+  {
+    "name": "farine",
+    "category": "Épicerie salée",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "sucre",
+    "category": "Épicerie sucrée",
+    "defaultUnit": "g"
+  },
+  {
+    "name": "sel",
+    "category": "Épicerie salée",
+    "defaultUnit": "pincée"
+  },
+  {
+    "name": "poivre",
+    "category": "Épicerie salée",
+    "defaultUnit": "pincée"
+  },
+  {
+    "name": "vinaigre",
+    "category": "Autre",
+    "defaultUnit": "ml"
+  },
+  {
+    "name": "citron",
+    "category": "Fruits et légumes",
+    "defaultUnit": "pièce"
+  },
+  {
+    "name": "moutarde",
+    "category": "Épicerie salée",
+    "defaultUnit": "c. à soupe"
+  },
+  {
+    "name": "pâte de curry",
+    "category": "Épicerie salée",
+    "defaultUnit": "c. à soupe"
+  },
+  {
+    "name": "miel",
+    "category": "Épicerie sucrée",
+    "defaultUnit": "c. à soupe"
+  },
+  {
+    "name": "yaourt",
+    "category": "Crèmerie et produits laitiers",
+    "defaultUnit": "unité"
+  },
+  {
+    "name": "pomme",
+    "category": "Fruits et légumes",
+    "defaultUnit": "pièce"
+  },
+  {
+    "name": "banane",
+    "category": "Fruits et légumes",
+    "defaultUnit": "pièce"
+  },
+  {
+    "name": "fraise",
+    "category": "Fruits et légumes",
+    "defaultUnit": "pièce"
+  },
+  {
+    "name": "chocolat",
+    "category": "Épicerie sucrée",
+    "defaultUnit": "pièce"
+  }
+]
+

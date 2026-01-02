@@ -109,7 +109,7 @@ export function CreateMealDialog({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button>
+        <Button size="lg">
           <Plus className="mr-2 h-4 w-4" />
           Ajouter un repas
         </Button>

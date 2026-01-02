@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getCategoryIcon } from "@/lib/ingredient-category-icons";
+import type { IngredientCategory } from "@/lib/constants";
 
 type Ingredient = {
   category?: string | null;
@@ -19,7 +20,9 @@ export function IngredientIcon({
   size = 20,
   className = "",
 }: IngredientIconProps) {
-  const iconPath = getCategoryIcon(ingredient.category);
+  const iconPath = getCategoryIcon(
+    ingredient.category as IngredientCategory | null | undefined
+  );
 
   return (
     <img

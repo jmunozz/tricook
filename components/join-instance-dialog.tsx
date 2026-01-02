@@ -10,7 +10,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +20,6 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { SelectSlotDialog } from "@/components/select-slot-dialog";
-import { UserPlus } from "lucide-react";
 
 export function JoinInstanceDialog() {
   const router = useRouter();
@@ -96,12 +94,6 @@ export function JoinInstanceDialog() {
   return (
     <>
       <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogTrigger asChild>
-          <Button variant="outline">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Rejoindre une instance
-          </Button>
-        </AlertDialogTrigger>
         <AlertDialogContent size="default" className="max-w-md">
           <form onSubmit={handleSubmit}>
             <AlertDialogHeader>

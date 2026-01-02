@@ -28,20 +28,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Vérifier que le repas existe et que l'utilisateur est propriétaire
+    // Vérifier que le repas existe
     const meal = await db.meal.findUnique({
       where: { id: mealId },
       include: {
-        slots: {
-          include: {
-            user: true,
-          },
-        },
         instance: {
           include: {
             users: {
               where: {
                 id: session.user.id,
+              },
+            },
+            slots: {
+              where: {
+                userId: session.user.id,
               },
             },
           },
@@ -53,13 +53,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Repas non trouvé" }, { status: 404 });
     }
 
-    // Vérifier que l'utilisateur est propriétaire du repas
-    const userSlot = meal.slots.find((slot) => slot.userId === session.user.id);
-    if (!userSlot) {
+    // Vérifier que l'utilisateur a accès à l'instance
+    if (meal.instance.users.length === 0) {
+      return NextResponse.json(
+        { error: "Vous n'avez pas accès à cette instance" },
+        { status: 403 }
+      );
+    }
+
+    // Vérifier que l'utilisateur a un slot dans l'instance
+    if (meal.instance.slots.length === 0) {
       return NextResponse.json(
         {
           error:
-            "Vous devez être propriétaire de ce repas pour ajouter des ingrédients",
+            "Vous devez avoir un slot dans cette instance pour ajouter des ingrédients",
         },
         { status: 403 }
       );

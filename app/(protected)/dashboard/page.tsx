@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CreateInstanceDialog } from "@/components/create-instance-dialog";
+import { JoinInstanceDialogWrapper } from "@/components/join-instance-dialog-wrapper";
 import Link from "next/link";
 import { Calendar, Users } from "lucide-react";
 
@@ -43,6 +44,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
+      <JoinInstanceDialogWrapper />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1>Séjours</h1>

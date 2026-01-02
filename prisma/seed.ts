@@ -1,206 +1,52 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
+import { INGREDIENT_CATEGORIES } from "../lib/constants";
+import ingredientsData from "./ingredients.json";
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
-const ingredients = [
-  "Tomate",
-  "Oignon",
-  "Ail",
-  "Carotte",
-  "Pomme de terre",
-  "Courgette",
-  "Aubergine",
-  "Poivron",
-  "Champignon",
-  "Épinard",
-  "Salade",
-  "Concombre",
-  "Brocoli",
-  "Chou-fleur",
-  "Céleri",
-  "Poireau",
-  "Basilic",
-  "Persil",
-  "Coriandre",
-  "Thym",
-  "Romarin",
-  "Laurier",
-  "Huile d'olive",
-  "Beurre",
-  "Crème fraîche",
-  "Lait",
-  "Fromage",
-  "Œuf",
-  "Poulet",
-  "Bœuf",
-  "Porc",
-  "Saumon",
-  "Thon",
-  "Crevette",
-  "Riz",
-  "Pâtes",
-  "Pain",
-  "Farine",
-  "Sucre",
-  "Sel",
-  "Poivre",
-  "Vinaigre",
-  "Citron",
-  "Moutarde",
-  "Pâte de curry",
-  "Miel",
-  "Yaourt",
-  "Pomme",
-  "Banane",
-  "Fraise",
-  "Chocolat",
-];
+type IngredientData = {
+  name: string;
+  category: string;
+  defaultUnit: string | null;
+};
 
-// Fonction pour assigner une unité par défaut à un ingrédient
-function getDefaultUnit(ingredientName: string): string | null {
-  const name = ingredientName.toLowerCase().trim();
+const ingredients = ingredientsData as IngredientData[];
 
-  // Unités par défaut selon le type d'ingrédient
-  const weightIngredients = [
-    "poulet",
-    "bœuf",
-    "porc",
-    "saumon",
-    "thon",
-    "crevette",
-    "fromage",
-    "beurre",
-  ];
-  const volumeIngredients = [
-    "huile d'olive",
-    "lait",
-    "crème fraîche",
-    "vinaigre",
-  ];
-  const pieceIngredients = [
-    "œuf",
-    "citron",
-    "pomme",
-    "banane",
-    "fraise",
-    "chocolat",
-  ];
-  const gramIngredients = [
-    "tomate",
-    "oignon",
-    "carotte",
-    "pomme de terre",
-    "courgette",
-    "aubergine",
-    "poivron",
-    "champignon",
-    "épinard",
-    "salade",
-    "concombre",
-    "brocoli",
-    "chou-fleur",
-    "céleri",
-    "poireau",
-    "riz",
-    "pâtes",
-    "farine",
-    "sucre",
-  ];
+// Validate that all categories in the JSON file are valid
+function validateCategories() {
+  const validCategories = new Set(INGREDIENT_CATEGORIES);
+  const invalidIngredients: string[] = [];
 
-  if (weightIngredients.includes(name)) return "g";
-  if (volumeIngredients.includes(name)) return "ml";
-  if (pieceIngredients.includes(name)) return "pièce";
-  if (gramIngredients.includes(name)) return "g";
+  for (const ingredient of ingredients) {
+    if (
+      ingredient.category &&
+      !validCategories.has(ingredient.category as any)
+    ) {
+      invalidIngredients.push(
+        `${ingredient.name}: "${ingredient.category}" is not a valid category`
+      );
+    }
+  }
 
-  return null;
-}
-
-// Fonction pour assigner une catégorie à un ingrédient
-function getIngredientCategory(ingredientName: string): string {
-  const name = ingredientName.toLowerCase().trim();
-
-  // Fruits et légumes
-  const fruitsEtLegumes = [
-    "tomate",
-    "oignon",
-    "carotte",
-    "pomme de terre",
-    "courgette",
-    "aubergine",
-    "poivron",
-    "champignon",
-    "épinard",
-    "salade",
-    "concombre",
-    "brocoli",
-    "chou-fleur",
-    "céleri",
-    "poireau",
-    "pomme",
-    "banane",
-    "fraise",
-    "citron",
-  ];
-
-  // Herbes et aromates
-  const herbesEtAromates = [
-    "basilic",
-    "persil",
-    "coriandre",
-    "thym",
-    "romarin",
-    "laurier",
-    "ail",
-  ];
-
-  // Épices
-  const epices = ["sel", "poivre", "moutarde", "pâte de curry"];
-
-  // Produits laitiers
-  const produitsLaitiers = [
-    "beurre",
-    "crème fraîche",
-    "lait",
-    "fromage",
-    "yaourt",
-  ];
-
-  // Viandes et poissons
-  const viandesEtPoissons = [
-    "poulet",
-    "bœuf",
-    "porc",
-    "saumon",
-    "thon",
-    "crevette",
-  ];
-
-  // Féculents
-  const feculents = ["riz", "pâtes", "pain", "farine"];
-
-  // Autres
-  const autres = ["huile d'olive", "vinaigre", "sucre", "miel", "chocolat"];
-
-  if (fruitsEtLegumes.includes(name)) return "fruit et légumes";
-  if (herbesEtAromates.includes(name)) return "herbes et aromates";
-  if (epices.includes(name)) return "épice";
-  if (produitsLaitiers.includes(name)) return "produits laitiers";
-  if (viandesEtPoissons.includes(name)) return "viande et poisson";
-  if (feculents.includes(name)) return "féculent";
-  if (autres.includes(name)) return "autre";
-
-  // Par défaut
-  return "autre";
+  if (invalidIngredients.length > 0) {
+    throw new Error(
+      `Invalid categories found:\n${invalidIngredients.join("\n")}`
+    );
+  }
 }
 
 async function main() {
   console.log("🌱 Début du seed...");
 
-  // Créer ou récupérer une instance globale pour les ingrédients approuvés
+  // Validate categories before proceeding
+  validateCategories();
+  console.log("✅ Catégories validées");
+
+  // Créer ou récupérer une instance globale (shadow) pour les ingrédients approuvés
   let globalInstance = await prisma.instance.findFirst({
     where: {
       name: "Global Ingredients",
@@ -233,14 +79,16 @@ async function main() {
         users: true,
       },
     });
-    console.log("✅ Instance globale créée");
+    console.log("✅ Instance globale (shadow) créée");
+  } else {
+    console.log("✅ Instance globale (shadow) trouvée");
   }
 
-  // Créer les ingrédients
-  for (const ingredientName of ingredients) {
-    const normalizedName = ingredientName.toLowerCase().trim();
-    const category = getIngredientCategory(ingredientName);
-    const defaultUnit = getDefaultUnit(ingredientName);
+  // Créer ou mettre à jour les ingrédients
+  for (const ingredientData of ingredients) {
+    const normalizedName = ingredientData.name.toLowerCase().trim();
+    const category = ingredientData.category || null;
+    const defaultUnit = ingredientData.defaultUnit || null;
 
     await prisma.ingredient.upsert({
       where: {

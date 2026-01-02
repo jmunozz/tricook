@@ -60,8 +60,8 @@
   --popover-foreground: #F2F2F2;
   --primary: #f72798;
   --primary-foreground: oklch(0.96 0.02 272);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --secondary: #27F786;
+  --secondary-foreground: #F2F2F2;
   --muted: #333333;
   --muted-foreground: #999999;
   --accent: oklch(0.97 0.001 106.424);

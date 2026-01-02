@@ -43,7 +43,12 @@ export function ExportShoppingListButton({
   };
 
   return (
-    <Button variant="outline" onClick={handleExport} disabled={isLoading}>
+    <Button
+      onClick={handleExport}
+      disabled={isLoading}
+      variant="secondary"
+      size="lg"
+    >
       <Download className="mr-2 h-4 w-4" />
       {isLoading ? "Export..." : "Exporter la liste de courses"}
     </Button>

@@ -3,6 +3,43 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/db";
 
+/**
+ * Convertit les unités de volume en grammes
+ * Assumption: 1L = 1000g (densité de l'eau)
+ */
+function convertToGrams(
+  quantity: number,
+  unit: string
+): { quantity: number; unit: string } {
+  const normalizedUnit = unit.trim().toLowerCase();
+
+  // Unités de volume à convertir en grammes
+  if (
+    normalizedUnit === "l" ||
+    normalizedUnit === "litre" ||
+    normalizedUnit === "litres"
+  ) {
+    return { quantity: quantity * 1000, unit: "g" };
+  }
+  if (
+    normalizedUnit === "ml" ||
+    normalizedUnit === "millilitre" ||
+    normalizedUnit === "millilitres"
+  ) {
+    return { quantity: quantity, unit: "g" }; // 1ml = 1g (eau)
+  }
+  if (
+    normalizedUnit === "cl" ||
+    normalizedUnit === "centilitre" ||
+    normalizedUnit === "centilitres"
+  ) {
+    return { quantity: quantity * 10, unit: "g" }; // 1cl = 10ml = 10g
+  }
+
+  // Si ce n'est pas une unité de volume, retourner tel quel
+  return { quantity, unit };
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -43,6 +80,10 @@ export async function GET(
       );
     }
 
+    // Collecter les noms des repas impliqués
+    const mealNames = instance.meals.map((meal) => meal.name).filter(Boolean);
+    const uniqueMealNames = Array.from(new Set(mealNames));
+
     // Agréger les ingrédients par nom et unité (même ingrédient + même unité = addition des quantités)
     const ingredientsMap = new Map<
       string,
@@ -51,20 +92,24 @@ export async function GET(
 
     instance.meals.forEach((meal) => {
       meal.mealIngredients.forEach((mi) => {
+        // Convertir les unités de volume en grammes
+        const { quantity: convertedQuantity, unit: convertedUnit } =
+          convertToGrams(mi.quantity, mi.unit);
+
         // Normaliser le nom de l'ingrédient et l'unité pour créer une clé unique
         const normalizedName = mi.ingredient.name.toLowerCase().trim();
-        const normalizedUnit = mi.unit.trim();
+        const normalizedUnit = convertedUnit.trim();
         const key = `${normalizedName}_${normalizedUnit}`;
 
         const existing = ingredientsMap.get(key);
 
         if (existing) {
           // Si l'ingrédient existe déjà avec la même unité, additionner les quantités
-          existing.quantity += mi.quantity;
+          existing.quantity += convertedQuantity;
         } else {
           // Sinon, créer une nouvelle entrée
           ingredientsMap.set(key, {
-            quantity: mi.quantity,
+            quantity: convertedQuantity,
             unit: normalizedUnit,
             category: mi.ingredient.category || "autre",
           });
@@ -77,6 +122,15 @@ export async function GET(
     lines.push(`LISTE DE COURSES - ${instance.name}`);
     lines.push(`Générée le ${new Date().toLocaleDateString("fr-FR")}`);
     lines.push("");
+
+    // Ajouter le résumé des repas impliqués
+    if (uniqueMealNames.length > 0) {
+      lines.push("REPAS INCLUS:");
+      uniqueMealNames.forEach((mealName) => {
+        lines.push(`  - ${mealName}`);
+      });
+      lines.push("");
+    }
 
     // Grouper les ingrédients par catégorie
     const ingredientsByCategory = new Map<

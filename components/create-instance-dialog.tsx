@@ -29,6 +29,7 @@ export function CreateInstanceDialog() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("handleSubmit");
     e.preventDefault();
     setError("");
 
@@ -56,11 +57,21 @@ export function CreateInstanceDialog() {
         return;
       }
 
-      setIsLoading(false);
-      setOpen(false);
-      setName("");
-      router.refresh();
+      // Success - navigate to the new instance
+      if (data.id) {
+        setIsLoading(false);
+        setOpen(false);
+        setName("");
+        router.push(`/instances/${data.id}`);
+      } else {
+        // Fallback: refresh the page if id is missing
+        setIsLoading(false);
+        setOpen(false);
+        setName("");
+        router.refresh();
+      }
     } catch (err) {
+      console.error("Erreur lors de la création de l'instance:", err);
       setError("Une erreur est survenue. Veuillez réessayer.");
       setIsLoading(false);
     }
@@ -73,8 +84,8 @@ export function CreateInstanceDialog() {
           Nouveau séjour
         </Button>
       </DialogTrigger>
-      <form onSubmit={handleSubmit}>
-        <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md">
+        <form onSubmit={handleSubmit} className="contents">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">
               Nouveau séjour
@@ -112,8 +123,8 @@ export function CreateInstanceDialog() {
               {isLoading ? "Création..." : "Créer"}
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }
